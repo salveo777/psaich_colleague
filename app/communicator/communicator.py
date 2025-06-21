@@ -1,6 +1,8 @@
 import os
 import requests
 from typing import List, Dict, Optional
+from app.models.base_model import BaseModel
+
 
 class Communicator:
     """
@@ -10,7 +12,7 @@ class Communicator:
     """
 
     def __init__(self, 
-                 model_url: str = "http://localhost:11434/api/generate", 
+                 model_url: str = "http://localhost:11434/api/chat", 
                  model_name: str = "mistral",
                  temperature: float = 0.7,
                  max_context_length: int = 2048,
@@ -18,6 +20,7 @@ class Communicator:
         self.model_url = model_url
         self.model_name = model_name
         self.temperature = temperature
+        self.model = BaseModel(model_name=model_name, temperature=temperature, ollama_url=model_url)
         self.max_context_length = max_context_length
         self.history: List[Dict[str, str]] = []  # Each message: {"role": "user"/"assistant", "content": ...}
         self.summary: Optional[str] = None  # Summary of conversation history
@@ -66,37 +69,27 @@ class Communicator:
         Send the prompt (and history) to the LLM backend and return the response.
         This uses the Ollama API (http://localhost:11434).
         """
-        # Build messages for chat context (system, user, assistant)
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        for msg in self.history:
-            messages.append(msg)
-        messages.append({"role": "user", "content": prompt})
+        # Update model parameters in case they changed
+        self.model.model_name = self.model_name
+        self.model.temperature = self.temperature
+        self.model.model_url = self.model_url
 
-        payload = {
-            "model": self.model_name,
-            "messages": messages,
-            "temperature": self.temperature,
-            "stream": False
-        }
-        try:
-            response = requests.post(self.model_url, json=payload, timeout=60)
-            response.raise_for_status()
-            data = response.json()
-            answer = data.get("message", {}).get("content", "")
-            # Add latest user and assistant message to history
-            self.add_message("user", prompt)
-            self.add_message("assistant", answer)
-            return answer
-        except Exception as e:
-            return f"Error communicating with LLM: {e}"
+        answer = self.model.generate_response(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            history=self.history
+        )
+
+        # Add latest user and assistant message to history
+        self.add_message("user", prompt)
+        self.add_message("assistant", answer)
+        return answer
 
     def reset_session(self):
         self.history = []
         self.summary = None
 
     def export_session(self, file_path: str):
+        import json
         with open(file_path, "w", encoding="utf-8") as f:
-            for msg in self.history:
-                f.write(f"{msg['role']}: {msg['content']}\n")
+            json.dump(self.history, f, indent=2)

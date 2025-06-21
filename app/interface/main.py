@@ -42,12 +42,15 @@ def load_history_from_json(json_str):
         return None
     return None
 
+def clear_input():
+    """Clear the user input field."""
+    st.session_state["user_input"] = ""
+
 # --- Initialize session state ---
 
 if "communicator" not in st.session_state:
     st.session_state.communicator = Communicator()
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+
 
 # --- Sidebar (settings) ---
 
@@ -70,7 +73,7 @@ temperature = st.sidebar.slider(
 )
 
 # Model selection
-models = ["base_model"]  # Add more as needed later
+models = ["mistral"]  # Add more as needed later
 selected_model = st.sidebar.selectbox("Model", models)
 
 # Upload chat history
@@ -85,7 +88,6 @@ if uploaded_file is not None:
     loaded_history = load_history_from_json(json_str)
     if loaded_history is not None:
         st.session_state.communicator.history = loaded_history
-        st.session_state.chat_history = loaded_history
         st.sidebar.success("Chat history loaded!")
     else:
         st.sidebar.error("Failed to load chat history. Expecting a JSON array or object with 'history' key.")
@@ -93,7 +95,6 @@ if uploaded_file is not None:
 # Action buttons
 if st.sidebar.button("Reset Session"):
     st.session_state.communicator.reset_session()
-    st.session_state.chat_history = []
 
 if st.sidebar.button("Summarise History"):
     summary = st.session_state.communicator.summarize_history()
@@ -122,7 +123,7 @@ for msg in st.session_state.communicator.history:
 st.subheader("Your Message")
 user_input = st.text_area("Type your message...", height=100)
 
-if st.button("Send") and user_input.strip():
+if st.button("Send", on_click=clear_input) and user_input.strip():
     # Set Communicator params
     st.session_state.communicator.model_name = selected_model
     st.session_state.communicator.temperature = temperature
@@ -138,4 +139,5 @@ if st.button("Send") and user_input.strip():
         prompt=user_input,
         system_prompt=base_prompt
     )
-    st.experimental_rerun()  # Refresh to show updated chat history
+    st.write("Assistant response:", response)
+    st.rerun()  # Refresh to show updated chat history
