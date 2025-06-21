@@ -1,6 +1,6 @@
 # PsAIch Colleague
 
-**PsAIch Colleague** is a modular Python application that provides psychotherapists with an "AI sparring chat partner" for supporting diagnosis and treatment planning. In this project I aim to learn about OOP, LLMs, modular code design, and good ML engineering practices.
+**PsAIch Colleague** is a modular Python application that provides psychotherapists with an "AI sparring chat partner" for supporting diagnosis and treatment planning. In this project I aim to learn about OOP, LLMs, modular code design, and good ML engineering practices along with git copilot.
 
 ## Features
 
@@ -19,7 +19,7 @@ psaich_colleague/
 ├── tests/                 # Unit/integration tests
 ├── data/                  # Example histories, prompts, etc.
 ├── scripts/               # Helper scripts
-├── .streamlit/            # Streamlit config
+├── .streamlit/             # Streamlit config
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -41,11 +41,12 @@ psaich_colleague/
     streamlit run app/interface/main.py
     ```
 
-## Recommended LLM Backends
-
-- [Ollama](https://ollama.com/) (for local models)
-- [Meta-Llama-3-8B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct)
-- [Mistral-7B-Instruct](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)
+## Tested LLM Backends
+[Ollama](https://ollama.com/) (pulled locally via "ollama pull ...")
+- mistral (7b)
+- llama3:8b
+- mixtral 
+- llama3:70b (unstable)
 
 ## Contributing
 

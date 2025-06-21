@@ -32,7 +32,7 @@ class BaseModel:
                 #f"{self.ollama_url}/api/chat",
                 self.ollama_url,
                 json=payload,
-                timeout=60,
+                timeout=300, # originally 60 secs
             )
             response.raise_for_status()
             data = response.json()

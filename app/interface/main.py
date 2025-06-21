@@ -73,7 +73,7 @@ temperature = st.sidebar.slider(
 )
 
 # Model selection
-models = ["mistral"]  # Add more as needed later
+models = ["llama3", "mistral", "mixtral", "llama3:70b"]  # Add more as needed later
 selected_model = st.sidebar.selectbox("Model", models)
 
 # Upload chat history
@@ -115,7 +115,8 @@ for msg in st.session_state.communicator.history:
     if msg["role"] == "user":
         st.markdown(f"**You:** {msg['content']}")
     elif msg["role"] == "assistant":
-        st.markdown(f"**AI:** {msg['content']}")
+        # st.markdown(f"**AI:** {msg['content']}")
+        st.markdown(f"**{selected_model}:** {msg['content']}")
     elif msg["role"] == "system":
         st.markdown(f"**System prompt:** {msg['content']}")
 

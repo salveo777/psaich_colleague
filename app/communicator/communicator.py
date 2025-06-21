@@ -15,7 +15,7 @@ class Communicator:
                  model_url: str = "http://localhost:11434/api/chat", 
                  model_name: str = "mistral",
                  temperature: float = 0.7,
-                 max_context_length: int = 2048,
+                 max_context_length: int = 4096, # 4096 for Llama 3, 2048 for Mistral
                  max_summary_length_percentage: float = 0.75):
         self.model_url = model_url
         self.model_name = model_name
