@@ -1,5 +1,6 @@
 import os
 import requests
+import json
 from typing import List, Dict, Optional
 from app.models.base_model import BaseModel
 
@@ -90,6 +91,5 @@ class Communicator:
         self.summary = None
 
     def export_session(self, file_path: str):
-        import json
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(self.history, f, indent=2)

@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 import json
+from pathlib import Path
+from datetime import datetime
 from app.communicator.communicator import Communicator
 
 # --- Helper functions ---
@@ -20,9 +22,8 @@ def load_prompt_text(filename, directory="data/prompts"):
     except Exception:
         return ""
 
-def get_download_path(filename="chat_history.txt"):
+def get_download_path(filename=f"{datetime.now().strftime('%Y-%m-%d_%H%M')}_chat-history.json"):
     """Suggest a path in user's Downloads or Documents folder (Windows)."""
-    from pathlib import Path
     downloads = Path.home() / "Downloads" / filename
     documents = Path.home() / "Documents" / filename
     # Prefer Downloads if it exists, else Documents
