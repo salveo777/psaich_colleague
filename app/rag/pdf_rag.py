@@ -37,24 +37,28 @@ class SimplePDFRAG:
         return documents
         
     def _build_vector_store(self):
+        # Late chunking: no early splitting!
         documents = self._load_pdfs()
         if not documents:
             self.vector_store = None
             self.retriever = None
             return
-        # Split documents into smaller chunks
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200) 
-        chunkgs = text_splitter.split_documents(documents)
-        # Create a vector store from the documents
-        self.vector_store = FAISS.from_documents(chunkgs, self.embedding_model)
+        self.vector_store = FAISS.from_documents(documents, self.embedding_model)
         self.retriever = self.vector_store.as_retriever()
 
-    def retrieve(self, query: str) -> List[str]:
+    def retrieve(self, query: str, k_docs: int = 4, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[str]:
         if not self.retriever:
             return []
-        docs = self.retriever.get_relevant_documents(query)
+        # Hole die k_docs relevantesten Dokumente (z.B. ganze Seiten/Kapitel)
+        docs = self.retriever.get_relevant_documents(query, k=k_docs)
         print("Retrieved docs from sources:", list(set(doc.metadata.get('source', '') for doc in docs)))
-        return [f"[{doc.metadata.get('source','')}] {doc.page_content}" for doc in docs]
+        # Jetzt erst splitten ("late chunking")
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        all_chunks = []
+        for doc in docs:
+            chunks = text_splitter.split_text(doc.page_content)
+            all_chunks.extend([f"[{doc.metadata.get('source','')}] {chunk}" for chunk in chunks])
+        return all_chunks
     
     def reload(self):
         """Reload the vector store from the PDF files."""
