@@ -62,6 +62,7 @@ coverage.xml
 data/*.log
 data/*.csv
 data/*.db
+data/*.pdf
 *.csv
 *.db
 

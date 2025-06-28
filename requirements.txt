@@ -1,2 +1,9 @@
 streamlit>=1.25.0
 requests>=2.28.0
+langchain
+langchain-community
+PyPDF2
+pypdf
+sentence-transformers
+faiss-cpu
+jina

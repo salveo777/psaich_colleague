@@ -93,6 +93,19 @@ if uploaded_file is not None:
     else:
         st.sidebar.error("Failed to load chat history. Expecting a JSON array or object with 'history' key.")
 
+# PDF RAG toggle
+enable_pdf_rag = st.sidebar.checkbox(
+    "Enable PDF RAG", value=getattr(st.session_state.communicator, "enable_pdf_rag", False)
+)
+st.session_state.communicator.enable_pdf_rag = enable_pdf_rag
+
+# Button to open PDF folder (shows path and copies to clipboard)
+pdf_path = getattr(st.session_state.communicator, "pdf_path", "data/pdfs")
+st.sidebar.write(f"PDF folder: `{pdf_path}`")
+if st.sidebar.button("Open PDF Folder"):
+    st.sidebar.info(f"Copy and paste PDFs into: `{os.path.abspath(pdf_path)}`")
+    st.sidebar.code(os.path.abspath(pdf_path))
+
 # Action buttons
 if st.sidebar.button("Reset Session"):
     st.session_state.communicator.reset_session()
@@ -105,6 +118,8 @@ if st.sidebar.button("Export Session"):
     file_path = get_download_path()
     st.session_state.communicator.export_session(file_path)
     st.success(f"Session exported to: {file_path}")
+
+
 
 # --- Main window ---
 
